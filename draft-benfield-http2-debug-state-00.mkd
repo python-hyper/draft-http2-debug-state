@@ -1,0 +1,384 @@
+---
+title: HTTP/2 Implementation Debug State
+abbrev: HTTP2-debug-state
+docname: draft-benfield-http2-debug-state-00
+date: 2016-07-27
+category: info
+
+ipr: trust200902
+area: Applications and Real-Time Area
+workgroup: Hypertext Transfer Protocol Working Group
+keyword: Internet-Draft
+
+stand_alone: yes
+pi: [toc, sortrefs, symrefs]
+
+author:
+ -
+    ins: C. Benfield
+    name: Cory Benfield
+    org: Hewlett Packard Enterprise
+    email: cory@lukasa.co.uk
+ -
+    ins: B. Fitzpatrick
+    name: Brad Fitzpatrick
+    org: Google, Inc.
+    email: brad@danga.com
+
+normative:
+  RFC7540:
+  RFC2119:
+  RFC5785:
+  RFC7231:
+
+
+--- abstract
+
+This document defines a standard format and well-known URI for HTTP/2 server
+implementations to expose their internal state for the purposes of debugging
+and interoperability work.
+
+--- middle
+
+Introduction        {#problems}
+============
+
+The HTTP/2 {{RFC7540}} specification provides an alternative framing layer for
+the semantics of HTTP/1.1 {{RFC7231}}. This alternative framing layer includes
+substantially greater quantities of state to be stored by all implementations.
+Disagreements on the state of the connection are the cause of the vast majority
+of interoperability errors in HTTP/2 implementations.
+
+In general it is not possible for implementations to query the internal state
+of their peer, and those implementations that do expose their internal state do
+it using a number of different interfaces, in different places, and in
+different formats. This makes it hard to debug interoperability problems,
+particularly when those problems arise on the open web with implementations
+that have unknown configuration and that may not identify themselves clearly.
+
+This document defines a standard format and well-known URI for HTTP/2 server
+implementations to make their internal state available for introspection. This
+allows both new and established implementers to do more effective testing of
+their implementations, as well as to enable them to more effectively diagnose
+and report subtle bugs in both their own and other implementations.
+
+Notational Conventions
+----------------------
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in RFC 2119 {{RFC2119}}.
+
+
+Debug Output   {#output}
+============
+
+An implementation that wishes to support the HTTP/2 debug state information
+does so by publishing a JSON document at a well-known URI ({{RFC5785}}):
+specifically, at .well-known/h2interop/state. This JSON document reveals
+aspects of the state of the specific HTTP/2 connection as seen by the
+implementation in question at the time of response generation.
+
+This JSON document is represented as a single JSON object with multiple keys.
+The object has several mandatory keys, as well as several optional ones. The
+fields are outlined below.
+
+Settings    {#settings}
+--------
+
+The "settings" key in the state object is associated with a JSON object that
+contains the remote implementation's active settings. These are the settings
+that are actually in force for the connection at this time. This means that
+if the implementation has emitted a SETTINGS frame but has not yet received an
+ACK, the changes in that SETTINGS frame MUST NOT be reflected in the object.
+
+Each setting is published along with its value. The name of each setting MUST
+be the same as its name in {{RFC7540}} Section 6.5.2: for example,
+"SETTINGS_ENABLE_PUSH". The values MUST be sent as JSON integers.
+
+An implementation MAY omit a setting from this object if it has never been
+emitted by the implementation. In this situation it should be assumed that the
+default value is in force.
+
+A conforming implementation MUST emit this field.
+
+Sample output:
+
+~~~~~~~~~~~
+"settings": {
+  "SETTINGS_MAX_CONCURRENT_STREAMS": 250,
+  "SETTINGS_MAX_FRAME_SIZE": 1048576,
+  "SETTINGS_MAX_HEADER_LIST_SIZE": 1048896
+}
+~~~~~~~~~~~
+{: #example-settings title="Example output for settings key"}
+
+
+Peer Settings
+-------------
+
+The "peerSettings" key in the state object is associated with a JSON object
+that contains the remote implementation's view of the local implementation's
+settings. These are the settings that are actually in force for the connection
+at this time.
+
+The value of this key is exactly symmetrical with the value of the "settings"
+key: see {{settings}} for more.
+
+A conforming implementation MUST emit this field.
+
+Sample output:
+
+~~~~~~~~~~~
+"peerSettings": {
+    "SETTINGS_HEADER_TABLE_SIZE": 4096,
+    "SETTINGS_ENABLE_PUSH": 1,
+    "SETTINGS_INITIAL_WINDOW_SIZE": 6291456,
+    "SETTINGS_MAX_FRAME_SIZE": 16384,
+    "SETTINGS_MAX_CONCURRENT_STREAMS": 1000
+}
+~~~~~~~~~~~
+{: #example-peer-settings title="Example output for peerSettings key"}
+
+
+Outbound Flow Control Window   {#outbound-window}
+----------------------------
+
+The "connFlowOut" key in the state object is associated with a JSON integer
+that reflects the remote peer's outbound connection window size. This
+represents the number of flow controlled bytes the remote implementation
+believes it can emit before the entire connection is blocked behind flow
+control.
+
+A conforming implementation MUST emit this field.
+
+Sample output:
+
+~~~~~~~~~~~
+"connFlowOut": 15724175,
+~~~~~~~~~~~
+{: #example-conn-flow-out title="Example output for connFlowOut key"}
+
+
+Inbound Flow Control Window.   {#inbound-window}
+---------------------------
+
+The "connFlowIn" key in the state object is associated with a JSON integer
+that reflects the remote peer's inbound connection window size. This represents
+the number of flow controlled bytes the remote implementation believes it can
+receive before the entire connection is blocked behind flow control.
+
+A conforming implementation MUST emit this field.
+
+Sample output:
+
+~~~~~~~~~~~
+"connFlowIn": 65535,
+~~~~~~~~~~~
+{: #example-conn-flow-in title="Example output for connFlowIn key"}
+
+
+Streams
+-------
+
+The "streams" key in the state object is associated with a JSON object
+containing state about all the active streams on the connection. A stream MUST
+be represnted in this JSON object if it is in any state other than IDLE or
+CLOSED.
+
+This JSON object has keys that are the stream IDs for the active streams. Each
+key has an object associated with it, with the following keys:
+
+- "state": This key maps to a string value representing the stream state.
+  The stream states are represented as all-caps ASCII text with all parentheses
+  stripped and spaces replaced with underscores. For example, "OPEN" or
+  "HALF_CLOSED_LOCAL". This field MUST be present.
+- "flowIn": The remote peer's inbound stream window size as a JSON integer.
+  This represents the number of flow controlled bytes the remote implementation
+  believes it can receive on this stream before this stream is blocked behind
+  flow control. This field MUST be present.
+- "flowOut": The remote peer's outbound stream window size as a JSON integer.
+  This represents the number of flow controlled bytes the remote implementation
+  believes it can send on this stream before this stream is blocked behind flow
+  control. This field MUST be present.
+- "dataIn": The number of bytes of data the remote implementation has
+  received on this stream. This excludes padding bytes. This field MAY be
+  present, but is optional.
+- "dataOut": The number of bytes of data the remote implementation has sent
+  on this stream. This excludes padding bytes. This field MAY be present, but
+  is optional.
+
+A conforming implementation MUST emit this field, but MAY omit any of the
+optional sub-fields.
+
+Sample output:
+
+~~~~~~~~~~~
+"streams": {
+  "5": {
+    "state": "HALF_CLOSED_REMOTE",
+    "flowIn": 65535,
+    "flowOut": 6291456,
+    "dataIn": 0,
+    "dataOut": 0
+  },
+  "7": {
+    "state": "OPEN",
+    "flowIn": 65535,
+    "flowOut": 6291456
+  }
+},
+~~~~~~~~~~~
+{: #example-streams title="Example output for streams key"}
+
+
+HPACK
+-----
+
+The "hpack" key contains information about the HPACK compression state for
+the connection. It maps to a JSON object that represents this compression
+state.
+
+This JSON object contains the following fields:
+
+- "inbound_table_size": The current size of the HPACK dynamic header table
+  for the headers emitted by the local implementation, as an integer. This
+  field MUST be present.
+- "outbound_table_size": The current size of the HPACK dynamic header table
+  for the headers emitted by the remote implementation, as an integer. Note
+  that this value MUST include the headers added to the compression context as
+  part of serving this response. This field MUST be present.
+- "inbound_dynamic_header_table": The entries added to the HPACK dynamic
+  header table by the local implementation. This is formatted as a JSON array
+  of two-element JSON arrays, the first element of which contains the header
+  name and the second element of which contains the header value. This field
+  MAY be omitted.
+- "outbound_dynamic_header_table": The entries added to the HPACK dynamic
+  header table by the remote implementation. This is formatted in the same
+  manner as "inbound_dynamic_header_table". This field MAY be omitted.
+
+A conforming implementation MAY omit this field. If it does include this field,
+it MAY omit any optional sub-fields.
+
+Sample output:
+
+~~~~~~~~~~~
+"hpack": {
+    "inbound_table_size": 340,
+    "inbound_dynamic_header_table": [
+        [
+            "accept-encoding",
+            "gzip, deflate, sdch, br"
+        ],
+        [
+            "upgrade-insecure-requests",
+            "1"
+        ],
+        [
+            "cache-control",
+            "max-age=0"
+        ],
+        [
+            ":authority",
+            "shootout.lukasa.co.uk"
+        ]
+    ],
+    "outbound_table_size": 137,
+    "outbound_dynamic_header_table": [
+        [
+            "content-type",
+            "application/json"
+        ],
+        [
+            "server",
+            "TwistedWeb/16.3.0"
+        ]
+    ]
+}
+~~~~~~~~~~~
+{: #example-hpack title="Example output for hpack key"}
+
+
+Sent GoAway
+-----------
+
+The "sentGoAway" field tracks whether or not a GOAWAY frame ({{RFC7540}}
+Section 6.8) has been sent on the connection by the remote implementation. The
+value of this field is boolean.
+
+A conforming implementation MAY omit this field.
+
+Sample output:
+
+~~~~~~~~~~~
+"sentGoAway": false,
+~~~~~~~~~~~
+{: #example-sent-go-away title="Example output for sentGoAway key"}
+
+
+Additional Fields
+-----------------
+
+In addition to these fields, implementations MAY add their own debugging
+information, as appropriate, to the JSON object. These MUST be keyed off keys
+other than the ones defined in this document. For example, some implementations
+are known to expose the number of threads they currently have active in the
+"threads" field.
+
+
+Debug Headers
+=============
+
+One of the most common issues when implementing HTTP/2 is to have problems with
+flow control windows. This is why the "connFlowOut" ({{outbound-window}}) and
+"connFlowIn" ({{inbound-window}}) fields are defined in the JSON document.
+
+However, it's possible that the two implementations disagree on the size of
+this window, and that the server believes that it cannot send the response body
+because it's blocked behind flow control. For this reason, a small amount of
+debugging data MUST be inserted into the response headers for this JSON
+document. This ensures that it is possible for implementations to discover that
+they have inadvertently blocked the debug response behind flow control, and to
+take action to widen the flow control window so that the response can be
+delivered.
+
+The following header fields MUST be emitted by implementations.
+
+Flow In
+-------
+
+The "conn-flow-in" header field contains the size of the remote
+implementation's inbound flow control window. The field value contains only the
+size of that window in octets. This MUST be calculated the same way that the
+implementation calculates "connFlowIn" ({{inbound-window}}).
+
+Flow Out
+--------
+
+The "conn-flow-out" header field contains the size of the remote
+implementation's outbound flow control window. The field value contains only
+the size of that window in octets. This MUST be calculated the same way that
+the implementation calculates "connFlowOut" ({{outbound-window}}).
+
+
+IANA Considerations
+===================
+
+Well-known URI
+--------------
+
+This document establishes a single well-known URI, with the suffix
+"h2interop/state".
+
+--- back
+
+Acknowledgements
+================
+
+We would like to thank the attendees of the 2016 HTTP Workshop in Stockholm for
+their feedback on early prototype implementations of this debugging feature.
+
+Changelog
+=========
+
+(This appendix to be deleted by the RFC editor.)
