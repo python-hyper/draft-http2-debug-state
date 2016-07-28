@@ -2,7 +2,7 @@
 title: HTTP/2 Implementation Debug State
 abbrev: HTTP2-debug-state
 docname: draft-benfield-http2-debug-state-00
-date: 2016-07-27
+date: 2016-07-28
 category: info
 
 ipr: trust200902
