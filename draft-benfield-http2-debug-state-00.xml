@@ -83,7 +83,7 @@ document are to be interpreted as described in RFC 2119 <xref target="RFC2119"/>
 
 <t>An implementation that wishes to support the HTTP/2 debug state information
 does so by publishing a JSON document at a well-known URI (<xref target="RFC5785"/>):
-specifically, at .well-known/h2interop/state. This JSON document reveals
+specifically, at .well-known/h2/state. This JSON document reveals
 aspects of the state of the specific HTTP/2 connection as seen by the
 implementation in question at the time of response generation.</t>
 
@@ -363,7 +363,7 @@ the implementation calculates “connFlowOut” (<xref target="outbound-window"/
 <section anchor="well-known-uri" title="Well-known URI">
 
 <t>This document establishes a single well-known URI, with the suffix
-“h2interop/state”.</t>
+“h2/state”.</t>
 
 </section>
 </section>
