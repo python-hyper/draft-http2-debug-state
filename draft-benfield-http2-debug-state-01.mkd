@@ -241,21 +241,21 @@ state.
 
 This JSON object contains the following fields:
 
-- "inbound_table_size": The current size of the HPACK dynamic header table
+- "inboundTableSize": The current size of the HPACK dynamic header table
   for the headers emitted by the local implementation, as an integer. This
   field MUST be present.
-- "outbound_table_size": The current size of the HPACK dynamic header table
+- "outboundTableSize": The current size of the HPACK dynamic header table
   for the headers emitted by the remote implementation, as an integer. Note
   that this value MUST include the headers added to the compression context as
   part of serving this response. This field MUST be present.
-- "inbound_dynamic_header_table": The entries added to the HPACK dynamic
+- "inboundDynamicHeaderTable": The entries added to the HPACK dynamic
   header table by the local implementation. This is formatted as a JSON array
   of two-element JSON arrays, the first element of which contains the header
   name and the second element of which contains the header value. This field
   MAY be omitted.
-- "outbound_dynamic_header_table": The entries added to the HPACK dynamic
+- "outboundDynamicHeaderTable": The entries added to the HPACK dynamic
   header table by the remote implementation. This is formatted in the same
-  manner as "inbound_dynamic_header_table". This field MAY be omitted.
+  manner as "outboundDynamicHeaderTable". This field MAY be omitted.
 
 A conforming implementation MAY omit this field. If it does include this field,
 it MAY omit any optional sub-fields.
@@ -264,8 +264,8 @@ Sample output:
 
 ~~~~~~~~~~~
 "hpack": {
-    "inbound_table_size": 340,
-    "inbound_dynamic_header_table": [
+    "inboundTableSize": 340,
+    "inboundDynamicHeaderTable": [
         [
             "accept-encoding",
             "gzip, deflate, sdch, br"
@@ -283,8 +283,8 @@ Sample output:
             "shootout.lukasa.co.uk"
         ]
     ],
-    "outbound_table_size": 137,
-    "outbound_dynamic_header_table": [
+    "outboundTableSize": 137,
+    "outboundDynamicHeaderTable": [
         [
             "content-type",
             "application/json"
@@ -381,4 +381,9 @@ their feedback on early prototype implementations of this debugging feature.
 Changelog
 =========
 
-(This appendix to be deleted by the RFC editor.)
+This appendix to be deleted by the RFC editor.)
+
+Since -00:
+
+- Changed URI from `/.well-known/h2interop/state` to `/.well-known/h2/state`.
+- Changed keys of "hpack" entry to all be camel-case, rather than snake-case.
