@@ -83,6 +83,21 @@ This JSON document is represented as a single JSON object with multiple keys.
 The object has several mandatory keys, as well as several optional ones. The
 fields are outlined below.
 
+Version
+-------
+
+The "version" key in the state object is associated with a string carrying the
+version of the debug output specification the debug output conforms to. For
+an implementation that supports this draft specification, the output must be
+"draft-01".
+
+Sample output:
+
+~~~~~~~~~~~
+"version": "draft-01"
+~~~~~~~~~~~
+{: #example-version title="Example output for version key"}
+
 Settings    {#settings}
 --------
 
@@ -386,3 +401,4 @@ Since -00:
 
 - Changed URI from `/.well-known/h2interop/state` to `/.well-known/h2/state`.
 - Changed keys of "hpack" entry to all be camel-case, rather than snake-case.
+- Added the "version" top-level key.
