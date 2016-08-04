@@ -376,6 +376,28 @@ the size of that window in octets. This MUST be calculated the same way that
 the implementation calculates "connFlowOut" ({{outbound-window}}).
 
 
+Security Considerations
+=======================
+
+HPACK State
+-----------
+
+For a single-hop HTTP/2 connection there is no risk in exposing the HPACK state
+to the client, as the only entity that can possibly have affected the HPACK
+state is the client itself.
+
+However, once intermediaries are considered this stops being true. If any
+intermediary is performing connection coalescing, the HPACK state will almost
+certainly include entries inserted into the dynamic table by or for multiple
+clients. Exposing this state will put the security and privacy of those other
+clients at risk.
+
+For this reason, if it is at all possible that a server implementing this
+specification may have an intermediary on a connection between itself and a
+client, the server MUST NOT emit the "hpack" key or any of its sub-fields. It
+is only safe to emit this key in controlled environments.
+
+
 IANA Considerations
 ===================
 
