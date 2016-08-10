@@ -222,6 +222,12 @@ key has an object associated with it, with the following keys:
 - "dataOut": The number of bytes of data the remote implementation has sent
   on this stream. This excludes padding bytes. This field MAY be present, but
   is optional.
+- "created": A timestamp indicating when the peer believes the stream first
+  transitioned out of the idle state (see [[RFC 7540]] Section 5.1). This time
+  stamp must be in the form of a Unix time stamp: that is, a number
+  representing the number of seconds since 00:00:00 Thursday 1 January 1970
+  UTC. This number may have any number of decimal digits. This field MAY be
+  present, but is optional.
 
 A conforming implementation MUST emit this field, but MAY omit any of the
 optional sub-fields.
@@ -235,7 +241,8 @@ Sample output:
     "flowIn": 65535,
     "flowOut": 6291456,
     "dataIn": 0,
-    "dataOut": 0
+    "dataOut": 0,
+    "created": 1470835059.619137
   },
   "7": {
     "state": "OPEN",
@@ -424,3 +431,4 @@ Since -00:
 - Changed URI from `/.well-known/h2interop/state` to `/.well-known/h2/state`.
 - Changed keys of "hpack" entry to all be camel-case, rather than snake-case.
 - Added the "version" top-level key.
+- Added the "created" sub-key to the "stream" objects.
