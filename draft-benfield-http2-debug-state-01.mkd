@@ -83,7 +83,7 @@ This JSON document is represented as a single JSON object with multiple keys.
 The object has several mandatory keys, as well as several optional ones. The
 fields are outlined below.
 
-Version
+Version    {#version}
 -------
 
 The "version" key in the state object is associated with a string carrying the
@@ -129,7 +129,7 @@ Sample output:
 {: #example-settings title="Example output for settings key"}
 
 
-Peer Settings
+Peer Settings    {#peer-settings}
 -------------
 
 The "peerSettings" key in the state object is associated with a JSON object
@@ -193,7 +193,7 @@ Sample output:
 {: #example-conn-flow-in title="Example output for connFlowIn key"}
 
 
-Streams
+Streams    {#streams}
 -------
 
 The "streams" key in the state object is associated with a JSON object
@@ -268,7 +268,7 @@ Sample output:
 {: #example-streams title="Example output for streams key"}
 
 
-HPACK
+HPACK    {#hpack}
 -----
 
 The "hpack" key contains information about the HPACK compression state for
@@ -335,7 +335,7 @@ Sample output:
 {: #example-hpack title="Example output for hpack key"}
 
 
-Sent GoAway
+Sent GoAway    {#sent-goaway}
 -----------
 
 The "sentGoAway" field tracks whether or not a GOAWAY frame ({{RFC7540}}
@@ -429,6 +429,85 @@ This document establishes a single well-known URI, with the suffix "h2/state".
 
 --- back
 
+Defined Fields
+==============
+
+This appendix contains tables of all defined fields, along with their field
+names, field value type, optionality, the versions in which they appear, and
+what section defines them.
+
+For fields whose values are objects, there are additional tables defining the
+fields in those sub-objects, with the same information.
+
+This can be used as a quick reference point.
+
+
+| Field Name   | Field Type | Optional? | Versions    | Section              |
+|--------------+------------+-----------+-------------+----------------------|
+| version      | String     | No        | draft-01 .. | {{version}}          |
+| settings     | Object     | No        | draft-01 .. | {{settings}}         |
+| peerSettings | Object     | No        | draft-01 .. | {{peer-settings}}    |
+| connFlowOut  | Number     | No        | draft-01 .. | {{outbound-window}}  |
+| connFlowIn   | Number     | No        | draft-01 .. | {{inbound-window}}   |
+| streams      | Object     | No        | draft-01 .. | {{streams}}          |
+| hpack        | Object     | Yes       | draft-01 .. | {{hpack}}            |
+| sentGoAway   | Boolean    | Yes       | draft-01 .. | {{sent-goaway}}      |
+{: #top-level-fields title="Top-level Fields"}
+
+
+Settings Sub-Fields
+-------------------
+
+This table lists the sub-fields of the "settings" and "peerSettings" values,
+each of which is a single JSON object containing the following fields.
+
+| Field Name                      | Field Type | Optional? | Versions    | Section      |
+|---------------------------------+------------+-----------+-------------+--------------|
+| SETTINGS_HEADER_TABLE_SIZE      | Number     | Yes       | draft-01 .. | {{settings}} |
+| SETTINGS_ENABLE_PUSH            | Number     | Yes       | draft-01 .. | {{settings}} |
+| SETTINGS_MAX_CONCURRENT_STREAMS | Number     | Yes       | draft-01 .. | {{settings}} |
+| SETTINGS_INITIAL_WINDOW_SIZE    | Number     | Yes       | draft-01 .. | {{settings}} |
+| SETTINGS_MAX_FRAME_SIZE         | Number     | Yes       | draft-01 .. | {{settings}} |
+| SETTINGS_MAX_HEADER_LIST_SIZE   | Number     | Yes       | draft-01 .. | {{settings}} |
+{: #settings-sub-fields title="settings and peerSettings Sub-Fields"}
+
+
+Streams Sub-Fields
+------------------
+
+This table lists the sub-fields of the "streams" value. The "streams" object is
+defined more thoroughly in section {{streams}}. All of the fields defined here
+appear in the objects that are the values of the "streams" sub-keys.
+
+| Field Name | Field Type | Optional? | Versions    | Section      |
+|------------+------------+-----------+-------------+--------------|
+| state      | String     | No        | draft-01 .. | {{streams}}  |
+| flowIn     | Number     | No        | draft-01 .. | {{streams}}  |
+| flowOut    | Number     | No        | draft-01 .. | {{streams}}  |
+| dataIn     | Number     | Yes       | draft-01 .. | {{streams}}  |
+| dataOut    | Number     | Yes       | draft-01 .. | {{streams}}  |
+| paddingIn  | Number     | Yes       | draft-01 .. | {{streams}}  |
+| paddingOut | Number     | Yes       | draft-01 .. | {{streams}}  |
+| queuedData | Number     | Yes       | draft-01 .. | {{streams}}  |
+| created    | Number     | Yes       | draft-01 .. | {{streams}}  |
+{: #stream-sub-fields title="Stream Sub-Fields"}
+
+
+HPACK Sub-Fields
+----------------
+
+This table lists the sub-fields of the "hpack" value, each of which is a single
+JSON object containing the following fields.
+
+| Field Name                 | Field Type             | Optional? | Versions    | Section    |
+|----------------------------+------------------------+-----------+-------------+------------|
+| inboundTableSize           | Number                 | No        | draft-01 .. | {{hpack}}  |
+| outboundTableSize          | Number                 | No        | draft-01 .. | {{hpack}}  |
+| inboundDynamicHeaderTable  | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
+| outboundDynamicHeaderTable | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
+{: #hpack-sub-fields title="HPACK Sub-Fields"}
+
+
 Acknowledgements
 ================
 
@@ -448,3 +527,4 @@ Since -00:
 - Added the "created" sub-key to the "stream" objects.
 - Added the "queuedData" sub-key to the "stream" objects.
 - Added the "paddingIn" and "paddingOut" sub-keys to the "stream" objects.
+- Added appendix documenting all field values.
