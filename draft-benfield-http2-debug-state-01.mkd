@@ -234,7 +234,7 @@ key has an object associated with it, with the following keys:
   be used to distinguish between these two cases. This field MAY be present,
   but is optional.
 - "created": A timestamp indicating when the peer believes the stream first
-  transitioned out of the idle state (see [[RFC 7540]] Section 5.1). This time
+  transitioned out of the idle state (see {{RFC7540}} Section 5.1). This time
   stamp must be in the form of a Unix time stamp: that is, a number
   representing the number of seconds since 00:00:00 Thursday 1 January 1970
   UTC. This number may have any number of decimal digits. This field MAY be
