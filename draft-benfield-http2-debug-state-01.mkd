@@ -461,14 +461,14 @@ Settings Sub-Fields
 This table lists the sub-fields of the "settings" and "peerSettings" values,
 each of which is a single JSON object containing the following fields.
 
-| Field Name                      | Field Type | Optional? | Versions    | Section      |
-|---------------------------------+------------+-----------+-------------+--------------|
-| SETTINGS_HEADER_TABLE_SIZE      | Number     | Yes       | draft-01 .. | {{settings}} |
-| SETTINGS_ENABLE_PUSH            | Number     | Yes       | draft-01 .. | {{settings}} |
-| SETTINGS_MAX_CONCURRENT_STREAMS | Number     | Yes       | draft-01 .. | {{settings}} |
-| SETTINGS_INITIAL_WINDOW_SIZE    | Number     | Yes       | draft-01 .. | {{settings}} |
-| SETTINGS_MAX_FRAME_SIZE         | Number     | Yes       | draft-01 .. | {{settings}} |
-| SETTINGS_MAX_HEADER_LIST_SIZE   | Number     | Yes       | draft-01 .. | {{settings}} |
+| Field Name                      | Field Type | Optional? | Versions    |
+|---------------------------------+------------+-----------+-------------|
+| SETTINGS_HEADER_TABLE_SIZE      | Number     | Yes       | draft-01 .. |
+| SETTINGS_ENABLE_PUSH            | Number     | Yes       | draft-01 .. |
+| SETTINGS_MAX_CONCURRENT_STREAMS | Number     | Yes       | draft-01 .. |
+| SETTINGS_INITIAL_WINDOW_SIZE    | Number     | Yes       | draft-01 .. |
+| SETTINGS_MAX_FRAME_SIZE         | Number     | Yes       | draft-01 .. |
+| SETTINGS_MAX_HEADER_LIST_SIZE   | Number     | Yes       | draft-01 .. |
 {: #table-settings-sub-fields title="settings and peerSettings Sub-Fields"}
 
 
@@ -479,17 +479,17 @@ This table lists the sub-fields of the "streams" value. The "streams" object is
 defined more thoroughly in section {{streams}}. All of the fields defined here
 appear in the objects that are the values of the "streams" sub-keys.
 
-| Field Name | Field Type | Optional? | Versions    | Section      |
-|------------+------------+-----------+-------------+--------------|
-| state      | String     | No        | draft-01 .. | {{streams}}  |
-| flowIn     | Number     | No        | draft-01 .. | {{streams}}  |
-| flowOut    | Number     | No        | draft-01 .. | {{streams}}  |
-| dataIn     | Number     | Yes       | draft-01 .. | {{streams}}  |
-| dataOut    | Number     | Yes       | draft-01 .. | {{streams}}  |
-| paddingIn  | Number     | Yes       | draft-01 .. | {{streams}}  |
-| paddingOut | Number     | Yes       | draft-01 .. | {{streams}}  |
-| queuedData | Number     | Yes       | draft-01 .. | {{streams}}  |
-| created    | Number     | Yes       | draft-01 .. | {{streams}}  |
+| Field Name | Field Type | Optional? | Versions    |
+|------------+------------+-----------+-------------|
+| state      | String     | No        | draft-01 .. |
+| flowIn     | Number     | No        | draft-01 .. |
+| flowOut    | Number     | No        | draft-01 .. |
+| dataIn     | Number     | Yes       | draft-01 .. |
+| dataOut    | Number     | Yes       | draft-01 .. |
+| paddingIn  | Number     | Yes       | draft-01 .. |
+| paddingOut | Number     | Yes       | draft-01 .. |
+| queuedData | Number     | Yes       | draft-01 .. |
+| created    | Number     | Yes       | draft-01 .. |
 {: #table-stream-sub-fields title="Stream Sub-Fields"}
 
 
@@ -499,12 +499,12 @@ HPACK Sub-Fields
 This table lists the sub-fields of the "hpack" value, each of which is a single
 JSON object containing the following fields.
 
-| Field Name                 | Field Type             | Optional? | Versions    | Section    |
-|----------------------------+------------------------+-----------+-------------+------------|
-| inboundTableSize           | Number                 | No        | draft-01 .. | {{hpack}}  |
-| outboundTableSize          | Number                 | No        | draft-01 .. | {{hpack}}  |
-| inboundDynamicHeaderTable  | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
-| outboundDynamicHeaderTable | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
+| Field Name                 | Field Type             | Optional? | Versions    |
+|----------------------------+------------------------+-----------+-------------|
+| inboundTableSize           | Number                 | No        | draft-01 .. |
+| outboundTableSize          | Number                 | No        | draft-01 .. |
+| inboundDynamicHeaderTable  | List of list of String | Yes       | draft-01 .. |
+| outboundDynamicHeaderTable | List of list of String | Yes       | draft-01 .. |
 {: #table-hpack-sub-fields title="HPACK Sub-Fields"}
 
 
