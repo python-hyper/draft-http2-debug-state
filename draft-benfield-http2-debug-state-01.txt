@@ -5,8 +5,8 @@
 Hypertext Transfer Protocol Working Group                    C. Benfield
 Internet-Draft                                Hewlett Packard Enterprise
 Intended status: Informational                            B. Fitzpatrick
-Expires: January 29, 2017                                   Google, Inc.
-                                                           July 28, 2016
+Expires: February 11, 2017                                  Google, Inc.
+                                                         August 10, 2016
 
 
                    HTTP/2 Implementation Debug State
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 29, 2017.
+   This Internet-Draft will expire on February 11, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 1]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 1]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
 Table of Contents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 2]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 2]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    This document defines a standard format and well-known URI for HTTP/2
@@ -165,9 +165,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 3]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 3]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    Each setting is published along with its value.  The name of each
@@ -221,9 +221,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 4]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 4]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
 2.4.  Outbound Flow Control Window
@@ -277,9 +277,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 5]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 5]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    o  "flowIn": The remote peer's inbound stream window size as a JSON
@@ -333,9 +333,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 6]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 6]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    "streams": {
@@ -389,9 +389,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 7]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 7]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
       formatted in the same manner as "outboundDynamicHeaderTable".
@@ -445,9 +445,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 8]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 8]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    A conforming implementation MAY omit this field.
@@ -501,9 +501,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017                [Page 9]
+Benfield & Fitzpatrick  Expires February 11, 2017               [Page 9]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    calculated the same way that the implementation calculates
@@ -557,9 +557,9 @@ Internet-Draft              HTTP2-debug-state                  July 2016
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017               [Page 10]
+Benfield & Fitzpatrick  Expires February 11, 2017              [Page 10]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    [RFC7540]  Belshe, M., Peon, R., and M. Thomson, Ed., "Hypertext
@@ -613,9 +613,9 @@ A.1.  Settings Sub-Fields
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017               [Page 11]
+Benfield & Fitzpatrick  Expires February 11, 2017              [Page 11]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
    +---------------------------------+---------+-----------+-----------+
@@ -669,9 +669,9 @@ A.2.  Streams Sub-Fields
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017               [Page 12]
+Benfield & Fitzpatrick  Expires February 11, 2017              [Page 12]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
            +------------+------------+-----------+-------------+
@@ -725,9 +725,9 @@ A.3.  HPACK Sub-Fields
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017               [Page 13]
+Benfield & Fitzpatrick  Expires February 11, 2017              [Page 13]
 
-Internet-Draft              HTTP2-debug-state                  July 2016
+Internet-Draft              HTTP2-debug-state                August 2016
 
 
 Appendix B.  Acknowledgements
@@ -781,4 +781,4 @@ Authors' Addresses
 
 
 
-Benfield & Fitzpatrick  Expires January 29, 2017               [Page 14]
+Benfield & Fitzpatrick  Expires February 11, 2017              [Page 14]
