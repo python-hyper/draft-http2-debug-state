@@ -222,6 +222,11 @@ key has an object associated with it, with the following keys:
 - "dataOut": The number of bytes of data the remote implementation has sent
   on this stream. This excludes padding bytes. This field MAY be present, but
   is optional.
+- "queuedData": The number of bytes of data the remote implementation has
+  available to send, but has not yet sent. These bytes may be blocked behind
+  flow control or priority information: the value of the "flowOut" field can
+  be used to distinguish between these two cases. This field MAY be present,
+  but is optional.
 - "created": A timestamp indicating when the peer believes the stream first
   transitioned out of the idle state (see [[RFC 7540]] Section 5.1). This time
   stamp must be in the form of a Unix time stamp: that is, a number
@@ -247,7 +252,8 @@ Sample output:
   "7": {
     "state": "OPEN",
     "flowIn": 65535,
-    "flowOut": 6291456
+    "flowOut": 6291456,
+    "queuedData": 59093,
   }
 },
 ~~~~~~~~~~~
@@ -432,3 +438,4 @@ Since -00:
 - Changed keys of "hpack" entry to all be camel-case, rather than snake-case.
 - Added the "version" top-level key.
 - Added the "created" sub-key to the "stream" objects.
+- Added the "queuedData" sub-key to the "stream" objects.
