@@ -9,7 +9,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc symrefs="yes"?>
 
-<rfc ipr="trust200902" docName="draft-benfield-http2-debug-state-00" category="info">
+<rfc ipr="trust200902" docName="draft-benfield-http2-debug-state-01" category="info">
 
   <front>
     <title abbrev="HTTP2-debug-state">HTTP/2 Implementation Debug State</title>
@@ -83,14 +83,28 @@ document are to be interpreted as described in RFC 2119 <xref target="RFC2119"/>
 
 <t>An implementation that wishes to support the HTTP/2 debug state information
 does so by publishing a JSON document at a well-known URI (<xref target="RFC5785"/>):
-specifically, at .well-known/h2/state. This JSON document reveals
-aspects of the state of the specific HTTP/2 connection as seen by the
-implementation in question at the time of response generation.</t>
+specifically, at .well-known/h2/state. This JSON document reveals aspects of
+the state of the specific HTTP/2 connection as seen by the implementation in
+question at the time of response generation.</t>
 
 <t>This JSON document is represented as a single JSON object with multiple keys.
 The object has several mandatory keys, as well as several optional ones. The
 fields are outlined below.</t>
 
+<section anchor="version" title="Version">
+
+<t>The “version” key in the state object is associated with a string carrying the
+version of the debug output specification the debug output conforms to. For
+an implementation that supports this draft specification, the output must be
+“draft-01”.</t>
+
+<t>Sample output:</t>
+
+<figure title="Example output for version key" anchor="example-version"><artwork><![CDATA[
+"version": "draft-01"
+]]></artwork></figure>
+
+</section>
 <section anchor="settings" title="Settings">
 
 <t>The “settings” key in the state object is associated with a JSON object that
@@ -207,6 +221,23 @@ present, but is optional.</t>
   <t>“dataOut”: The number of bytes of data the remote implementation has sent
 on this stream. This excludes padding bytes. This field MAY be present, but
 is optional.</t>
+  <t>“paddingIn”: The number of padding bytes the remote implementation has
+received on this stream. This excludes data bytes. This field MAY be present,
+but is optional.</t>
+  <t>“paddingOut”: The number of padding bytes the remote implementation has
+sent on this stream. This excludes data bytes. This field MAY be present, but
+is optional.</t>
+  <t>“queuedData”: The number of bytes of data the remote implementation has
+available to send, but has not yet sent. These bytes may be blocked behind
+flow control or priority information: the value of the “flowOut” field can
+be used to distinguish between these two cases. This field MAY be present,
+but is optional.</t>
+  <t>“created”: A timestamp indicating when the peer believes the stream first
+transitioned out of the idle state (see <xref target="RFC7540"/> Section 5.1). This time
+stamp must be in the form of a Unix time stamp: that is, a number
+representing the number of seconds since 00:00:00 Thursday 1 January 1970
+UTC. This number may have any number of decimal digits. This field MAY be
+present, but is optional.</t>
 </list></t>
 
 <t>A conforming implementation MUST emit this field, but MAY omit any of the
@@ -221,12 +252,16 @@ optional sub-fields.</t>
     "flowIn": 65535,
     "flowOut": 6291456,
     "dataIn": 0,
-    "dataOut": 0
+    "dataOut": 0,
+    "paddingIn": 0,
+    "paddingOut": 0,
+    "created": 1470835059.619137
   },
   "7": {
     "state": "OPEN",
     "flowIn": 65535,
-    "flowOut": 6291456
+    "flowOut": 6291456,
+    "queuedData": 59093,
   }
 },
 ]]></artwork></figure>
@@ -241,21 +276,21 @@ state.</t>
 <t>This JSON object contains the following fields:</t>
 
 <t><list style="symbols">
-  <t>“inbound_table_size”: The current size of the HPACK dynamic header table
+  <t>“inboundTableSize”: The current size of the HPACK dynamic header table
 for the headers emitted by the local implementation, as an integer. This
 field MUST be present.</t>
-  <t>“outbound_table_size”: The current size of the HPACK dynamic header table
+  <t>“outboundTableSize”: The current size of the HPACK dynamic header table
 for the headers emitted by the remote implementation, as an integer. Note
 that this value MUST include the headers added to the compression context as
 part of serving this response. This field MUST be present.</t>
-  <t>“inbound_dynamic_header_table”: The entries added to the HPACK dynamic
+  <t>“inboundDynamicHeaderTable”: The entries added to the HPACK dynamic
 header table by the local implementation. This is formatted as a JSON array
 of two-element JSON arrays, the first element of which contains the header
 name and the second element of which contains the header value. This field
 MAY be omitted.</t>
-  <t>“outbound_dynamic_header_table”: The entries added to the HPACK dynamic
+  <t>“outboundDynamicHeaderTable”: The entries added to the HPACK dynamic
 header table by the remote implementation. This is formatted in the same
-manner as “inbound_dynamic_header_table”. This field MAY be omitted.</t>
+manner as “outboundDynamicHeaderTable”. This field MAY be omitted.</t>
 </list></t>
 
 <t>A conforming implementation MAY omit this field. If it does include this field,
@@ -265,8 +300,8 @@ it MAY omit any optional sub-fields.</t>
 
 <figure title="Example output for hpack key" anchor="example-hpack"><artwork><![CDATA[
 "hpack": {
-    "inbound_table_size": 340,
-    "inbound_dynamic_header_table": [
+    "inboundTableSize": 340,
+    "inboundDynamicHeaderTable": [
         [
             "accept-encoding",
             "gzip, deflate, sdch, br"
@@ -284,8 +319,8 @@ it MAY omit any optional sub-fields.</t>
             "shootout.lukasa.co.uk"
         ]
     ],
-    "outbound_table_size": 137,
-    "outbound_dynamic_header_table": [
+    "outboundTableSize": 137,
+    "outboundDynamicHeaderTable": [
         [
             "content-type",
             "application/json"
@@ -358,12 +393,32 @@ the implementation calculates “connFlowOut” (<xref target="outbound-window"/
 
 </section>
 </section>
+<section anchor="security-considerations" title="Security Considerations">
+
+<section anchor="hpack-state" title="HPACK State">
+
+<t>For a single-hop HTTP/2 connection there is no risk in exposing the HPACK state
+to the client, as the only entity that can possibly have affected the HPACK
+state is the client itself.</t>
+
+<t>However, once intermediaries are considered this stops being true. If any
+intermediary is performing connection coalescing, the HPACK state will almost
+certainly include entries inserted into the dynamic table by or for multiple
+clients. Exposing this state will put the security and privacy of those other
+clients at risk.</t>
+
+<t>For this reason, if it is at all possible that a server implementing this
+specification may have an intermediary on a connection between itself and a
+client, the server MUST NOT emit the “hpack” key or any of its sub-fields. It
+is only safe to emit this key in controlled environments.</t>
+
+</section>
+</section>
 <section anchor="iana-considerations" title="IANA Considerations">
 
 <section anchor="well-known-uri" title="Well-known URI">
 
-<t>This document establishes a single well-known URI, with the suffix
-“h2/state”.</t>
+<t>This document establishes a single well-known URI, with the suffix “h2/state”.</t>
 
 </section>
 </section>
@@ -441,6 +496,182 @@ the implementation calculates “connFlowOut” (<xref target="outbound-window"/
 
 
 
+<section anchor="defined-fields" title="Defined Fields">
+
+<t>This appendix contains tables of all defined fields, along with their field
+names, field value type, optionality, the versions in which they appear, and
+what section defines them.</t>
+
+<t>For fields whose values are objects, there are additional tables defining the
+fields in those sub-objects, with the same information.</t>
+
+<t>This can be used as a quick reference point.</t>
+
+<texttable title="Top-level Fields" anchor="top-level-fields">
+      <ttcol align='left'>Field Name</ttcol>
+      <ttcol align='left'>Field Type</ttcol>
+      <ttcol align='left'>Optional?</ttcol>
+      <ttcol align='left'>Versions</ttcol>
+      <ttcol align='left'>Section</ttcol>
+      <c>version</c>
+      <c>String</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="version"/></c>
+      <c>settings</c>
+      <c>Object</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="settings"/></c>
+      <c>peerSettings</c>
+      <c>Object</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="peer-settings"/></c>
+      <c>connFlowOut</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="outbound-window"/></c>
+      <c>connFlowIn</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="inbound-window"/></c>
+      <c>streams</c>
+      <c>Object</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c><xref target="streams"/></c>
+      <c>hpack</c>
+      <c>Object</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c><xref target="hpack"/></c>
+      <c>sentGoAway</c>
+      <c>Boolean</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c><xref target="sent-goaway"/></c>
+</texttable>
+
+<section anchor="settings-sub-fields" title="Settings Sub-Fields">
+
+<t>This table lists the sub-fields of the “settings” and “peerSettings” values,
+each of which is a single JSON object containing the following fields.</t>
+
+<texttable title="settings and peerSettings Sub-Fields" anchor="table-settings-sub-fields">
+      <ttcol align='left'>Field Name</ttcol>
+      <ttcol align='left'>Field Type</ttcol>
+      <ttcol align='left'>Optional?</ttcol>
+      <ttcol align='left'>Versions</ttcol>
+      <c>SETTINGS_HEADER_TABLE_SIZE</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>SETTINGS_ENABLE_PUSH</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>SETTINGS_MAX_CONCURRENT_STREAMS</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>SETTINGS_INITIAL_WINDOW_SIZE</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>SETTINGS_MAX_FRAME_SIZE</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>SETTINGS_MAX_HEADER_LIST_SIZE</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+</texttable>
+
+</section>
+<section anchor="streams-sub-fields" title="Streams Sub-Fields">
+
+<t>This table lists the sub-fields of the “streams” value. The “streams” object is
+defined more thoroughly in section <xref target="streams"/>. All of the fields defined here
+appear in the objects that are the values of the “streams” sub-keys.</t>
+
+<texttable title="Stream Sub-Fields" anchor="table-stream-sub-fields">
+      <ttcol align='left'>Field Name</ttcol>
+      <ttcol align='left'>Field Type</ttcol>
+      <ttcol align='left'>Optional?</ttcol>
+      <ttcol align='left'>Versions</ttcol>
+      <c>state</c>
+      <c>String</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c>flowIn</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c>flowOut</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c>dataIn</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>dataOut</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>paddingIn</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>paddingOut</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>queuedData</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>created</c>
+      <c>Number</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+</texttable>
+
+</section>
+<section anchor="hpack-sub-fields" title="HPACK Sub-Fields">
+
+<t>This table lists the sub-fields of the “hpack” value, each of which is a single
+JSON object containing the following fields.</t>
+
+<texttable title="HPACK Sub-Fields" anchor="table-hpack-sub-fields">
+      <ttcol align='left'>Field Name</ttcol>
+      <ttcol align='left'>Field Type</ttcol>
+      <ttcol align='left'>Optional?</ttcol>
+      <ttcol align='left'>Versions</ttcol>
+      <c>inboundTableSize</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c>outboundTableSize</c>
+      <c>Number</c>
+      <c>No</c>
+      <c>draft-01 ..</c>
+      <c>inboundDynamicHeaderTable</c>
+      <c>List of list of String</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+      <c>outboundDynamicHeaderTable</c>
+      <c>List of list of String</c>
+      <c>Yes</c>
+      <c>draft-01 ..</c>
+</texttable>
+
+</section>
+</section>
 <section anchor="acknowledgements" title="Acknowledgements">
 
 <t>We would like to thank the attendees of the 2016 HTTP Workshop in Stockholm for
@@ -449,7 +680,19 @@ their feedback on early prototype implementations of this debugging feature.</t>
 </section>
 <section anchor="changelog" title="Changelog">
 
-<t>(This appendix to be deleted by the RFC editor.)</t>
+<t>This appendix to be deleted by the RFC editor.)</t>
+
+<t>Since -00:</t>
+
+<t><list style="symbols">
+  <t>Changed URI from <spanx style="verb">/.well-known/h2interop/state</spanx> to <spanx style="verb">/.well-known/h2/state</spanx>.</t>
+  <t>Changed keys of “hpack” entry to all be camel-case, rather than snake-case.</t>
+  <t>Added the “version” top-level key.</t>
+  <t>Added the “created” sub-key to the “stream” objects.</t>
+  <t>Added the “queuedData” sub-key to the “stream” objects.</t>
+  <t>Added the “paddingIn” and “paddingOut” sub-keys to the “stream” objects.</t>
+  <t>Added appendix documenting all field values.</t>
+</list></t>
 
 </section>
 
