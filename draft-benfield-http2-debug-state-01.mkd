@@ -469,7 +469,7 @@ each of which is a single JSON object containing the following fields.
 | SETTINGS_INITIAL_WINDOW_SIZE    | Number     | Yes       | draft-01 .. | {{settings}} |
 | SETTINGS_MAX_FRAME_SIZE         | Number     | Yes       | draft-01 .. | {{settings}} |
 | SETTINGS_MAX_HEADER_LIST_SIZE   | Number     | Yes       | draft-01 .. | {{settings}} |
-{: #settings-sub-fields title="settings and peerSettings Sub-Fields"}
+{: #table-settings-sub-fields title="settings and peerSettings Sub-Fields"}
 
 
 Streams Sub-Fields
@@ -490,7 +490,7 @@ appear in the objects that are the values of the "streams" sub-keys.
 | paddingOut | Number     | Yes       | draft-01 .. | {{streams}}  |
 | queuedData | Number     | Yes       | draft-01 .. | {{streams}}  |
 | created    | Number     | Yes       | draft-01 .. | {{streams}}  |
-{: #stream-sub-fields title="Stream Sub-Fields"}
+{: #table-stream-sub-fields title="Stream Sub-Fields"}
 
 
 HPACK Sub-Fields
@@ -505,7 +505,7 @@ JSON object containing the following fields.
 | outboundTableSize          | Number                 | No        | draft-01 .. | {{hpack}}  |
 | inboundDynamicHeaderTable  | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
 | outboundDynamicHeaderTable | List of list of String | Yes       | draft-01 .. | {{hpack}}  |
-{: #hpack-sub-fields title="HPACK Sub-Fields"}
+{: #table-hpack-sub-fields title="HPACK Sub-Fields"}
 
 
 Acknowledgements
