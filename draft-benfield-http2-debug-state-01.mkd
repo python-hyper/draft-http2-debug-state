@@ -222,6 +222,12 @@ key has an object associated with it, with the following keys:
 - "dataOut": The number of bytes of data the remote implementation has sent
   on this stream. This excludes padding bytes. This field MAY be present, but
   is optional.
+- "paddingIn": The number of padding bytes the remote implementation has
+  received on this stream. This excludes data bytes. This field MAY be present,
+  but is optional.
+- "paddingOut": The number of padding bytes the remote implementation has
+  sent on this stream. This excludes data bytes. This field MAY be present, but
+  is optional.
 - "queuedData": The number of bytes of data the remote implementation has
   available to send, but has not yet sent. These bytes may be blocked behind
   flow control or priority information: the value of the "flowOut" field can
@@ -247,6 +253,8 @@ Sample output:
     "flowOut": 6291456,
     "dataIn": 0,
     "dataOut": 0,
+    "paddingIn": 0,
+    "paddingOut": 0,
     "created": 1470835059.619137
   },
   "7": {
@@ -439,3 +447,4 @@ Since -00:
 - Added the "version" top-level key.
 - Added the "created" sub-key to the "stream" objects.
 - Added the "queuedData" sub-key to the "stream" objects.
+- Added the "paddingIn" and "paddingOut" sub-keys to the "stream" objects.
